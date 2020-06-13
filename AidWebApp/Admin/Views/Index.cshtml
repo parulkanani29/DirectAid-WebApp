@@ -1,0 +1,351 @@
+﻿@using AidWebApp
+@using Utility;
+@using static Utility.Extensions;
+@model IEnumerable<AidWebApp.Models.ApplicationViewModel>
+@{
+    ViewData["Title"] = "Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var count = 0;
+    var count2 = 0;
+}
+<div class="loder"></div>
+<div class="dashboard-content">
+    <div class="display-4-main text-center">
+        <h1 class="display-4">Welcome To Admin Area</h1>
+    </div>
+
+    <div class="row" style="margin:0;">
+        <div class="content-box">
+            <span>  Contract Balance:</span>
+            <label id="balance">0.00 </label> CRS
+        </div>
+        <div class="content-box">
+            <span>Active Address </span>
+            <label>@User.GetWalletAddress()</label>
+        </div>
+        <div class="content-box1">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#amount-category-modal">
+                Set Amount for Category
+            </button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#contract-fund-modal">
+                Add Fund To Contract
+            </button>
+        </div>
+    </div>
+
+    <div>
+        <!-- Modal amount start -->
+        <div class="modal fade" id="amount-category-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title  modal-title-label">Set Category Amount</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Category </label>
+                            @{ var categoryList = Html.GetEnumSelectList<Enums.ApplicationCategory>(); }
+
+                            <select id="category-id" class="form-control">
+                                @foreach (var category in categoryList)
+                                {
+                                    var enumName = (Enums.ApplicationCategory)Convert.ToInt16(category.Value);
+
+                                    <option value="@category.Value">@enumName.GetDisplayName()</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label> Amount </label>
+                            <input type="number" id="category-amount" class="form-control" name="amount" placeholder="Amount">
+                        </div>
+                        <div class="form-group">
+                            <label> Wallet Password </label>
+                            <input type="password" id="category-wallet-password" class="form-control" placeholder="wallet password">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button id="submit-category-amount" type="button" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal amount end -->
+    </div>
+    <br />
+    <div>
+        <!-- Modal contract fund start-->
+        <div class="modal fade" id="contract-fund-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title modal-title-label">Add Contract Fund</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <input type="number" id="fund-amount" class="form-control" name="fundamount" placeholder="Amount">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="fund-wallet-password" class="form-control" placeholder="Wallet Password">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="contract-fund-submit" type="button" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal contract fund end-->
+    </div>
+    <div class="user-details mb-3">
+        <div class="text-body">
+            Pending Applications
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        NO#
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Category)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.WalletAddress)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserFullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AverageIncome)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(x => x.Status == Enums.ApplicationStatus.Pending))
+                {
+                    <tr>
+                        <td>
+                            @{
+                                count++;
+                            }
+                            @count
+                        </td>
+                        @Html.HiddenFor(modelItem => item.Id)
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Category)
+                        </td>
+                        <td>
+                            <p>@Html.DisplayFor(modelItem => item.WalletAddress)</p>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserFullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AverageIncome)
+                        </td>
+                        <td>
+                            <span class="u-label u-label--sm status-@item.Status.ToString().ToLower()">
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </span>
+                        </td>
+                        <td>
+                            <a href="@(Url.Action("Approve", "Admin", new { id = item.Id }))" class="btn btn-outline-primary btn-sm" OnClick="startLoading()">Approve</a> |
+                            <a href="@(Url.Action("Reject", "Admin", new { id = item.Id }))" class="btn btn-outline-primary btn-sm" OnClick="startLoading()">Reject</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="user-details">
+        <div class="text-body">
+            All Applications
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        NO#
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Category)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.WalletAddress)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserFullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AverageIncome)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(x => x.Status != Enums.ApplicationStatus.Pending))
+                {
+                    <tr>
+                        <td>
+                            @{
+                                count2++;
+                            }
+                            @count2
+                        </td>
+                        @Html.HiddenFor(modelItem => item.Id)
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Category)
+                        </td>
+                        <td>
+                            <p>@Html.DisplayFor(modelItem => item.WalletAddress)</p>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserFullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.AverageIncome)
+                        </td>
+                        <td>
+                            <span class="u-label u-label--sm status-@item.Status.ToString().ToLower()">
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+
+        $("body").addClass("admin");
+
+        $(document).ready(function () {
+
+            getContractBalance();
+
+            $("#submit-category-amount").click(function () {
+
+                var category = $('#category-id').val();
+                var amount = $('#category-amount').val();
+                var walletPassword = $('#category-wallet-password').val();
+
+                if (category === "" || amount === "" || walletPassword === "") {
+                    toastr.error("Please provide valid input");
+                    return false;
+                }
+
+                setCategoryAmount(category, amount, walletPassword);
+            });
+
+            $("#contract-fund-submit").click(function () {
+
+                var fundValue = $('#fund-amount').val();
+                var walletPassword = $('#fund-wallet-password').val();
+
+                addContractFund(fundValue, walletPassword);
+
+            });
+        });
+
+        function setCategoryAmount(categoryId, amount, password) {
+
+            $('#amount-category-modal').modal('hide');
+            $('.loder').preloader();
+
+            var model = {
+                Category: categoryId,
+                Amount: amount,
+                WalletPassword: password
+            }
+
+            $.post("Admin/SetCategoryAmount",
+                { model },
+                function (response) {
+
+                    if (response.success) {
+                        toastr.success(response.message);
+                        $('.loder').preloader('remove');
+
+                    } else {
+                        toastr.error(response.message);
+                        $('.loder').preloader('remove');;
+                        $('#amount-category-modal').modal('show');
+                    }
+                })
+                .fail(function (error) {
+                    toastr.error("Internal server error, please try again");
+                    $('.loder').preloader('remove');
+                    console.log(error);
+                    return;
+                });
+        }
+
+        function addContractFund(amount, password) {
+            $('.loder').preloader();
+
+            $('#contract-fund-modal').modal('hide');
+
+            $.ajax({
+                type: 'POST',
+                url: 'Admin/AddFundToContract',
+                dataType: 'json',
+                data: { fundAmount: amount, walletPassword: password },
+                success: function (response) {
+                    if (response.success) {
+                        toastr.success(response.message);
+                        location.reload();
+
+                    } else {
+                        $('#contract-fund-modal').modal('show');
+                        toastr.error(response.message);
+                    }
+
+                    $('.loder').preloader('remove');
+                },
+                error: function (error) {
+                    console.log(error);
+                    toastr.error("Internal server error!");
+                    $('#contract-fund-modal').modal('show');
+                    $('.loder').preloader('remove');
+                    return;
+                }
+            });
+        }
+
+        function getContractBalance() {
+            $.get('Admin/GetContractBalance',
+                function (data) {
+                    $('#balance').html(data);
+                })
+                .fail(function (data) {
+                    console.log(data);
+                });
+        }
+
+    </script>
+}

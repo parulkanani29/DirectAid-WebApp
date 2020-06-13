@@ -1,0 +1,112 @@
+﻿@using Utility
+@model AidWebApp.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var count = 0;
+}
+
+<div id="modal-placeholder"></div>
+<div class="dashboard-content">
+    <div class="row" style="margin:0;">
+        <div class="content-box">
+            <span> Address Balance</span>
+            <label id="balance">0.00 </label> CRS
+        </div>
+        <div class="content-box">
+            <span>Active Address </span>
+            <label>@User.GetWalletAddress()</label>
+        </div>
+        <div class="content-box1">
+            <button type="button" class="btn btn-primary" data-toggle="ajax-modal" data-target="#submit-application" data-url="@Url.Action("SubmitApplication", "Application")">
+                Submit Application
+            </button>
+        </div>
+    </div>
+
+    <div class="user-details">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Block
+                    </th>
+                    <th>
+                        Category
+                    </th>
+                    <th>
+                        User
+                    </th>
+
+                    <th>
+                        Identification Number
+                    </th>
+                    <th>
+                        Average Income
+                    </th>
+                    <th>
+                        Application Status
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var application in Model.Application)
+                {
+                    <tr>
+                        <td>
+                            @{
+                                count++;
+                            }
+                            @count
+                        </td>
+                        @Html.HiddenFor(modelItem => application.Id)
+
+                        <td>
+                            @{ var category = application.Category.GetDisplayName(); }
+                            @Html.DisplayFor(modelItem => category)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => application.UserFullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => application.IdentificationNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => application.AverageIncome)
+                        </td>
+                        <td>
+                            @{ var applicationStatus = application.Status.GetDisplayName(); }
+                            <span class="u-label u-label--sm status-@application.Status.ToString().ToLower()">                                
+                                @Html.DisplayFor(modelItem => applicationStatus)
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            $("body").addClass("user-dashboard");
+            getBalance();
+
+        });
+
+        function getBalance() {
+            $.get('GetAddressBalance', function (data) {
+                $('#balance').html(data);
+            })
+                .fail(function (data) {
+                    console.log(data);
+                });
+        }
+
+    </script>
+}

@@ -1,0 +1,72 @@
+﻿@model IEnumerable<AidWebApp.Models.TransactionViewModel>
+@{
+    ViewData["Title"] = "ApprovedApplication";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var count = 0;
+}
+<div class="dashboard-content">
+    <div class="user-details">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        No#
+                    </th>
+                    <th>
+                        From
+                    </th>
+                    <th>
+                        To
+                    </th>
+                    <th>
+                        Amount
+                    </th>
+                    <th>
+                        Tx Hash
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transaction in Model)
+                {
+                    <tr>
+                        <td>
+                            @{
+                                count++;
+                            }
+                            @count
+                        </td>
+                        <td>
+                            <p> @transaction.From</p>
+                        </td>
+                        <td>
+                            <p>@transaction.To </p>
+                        </td>
+                        <td>
+                            @transaction.Amount CRS
+                        </td>
+                        <td>
+                            <p>@transaction.TransactionHash </p>
+                        </td>
+                        <td>
+                            <span class="u-label u-label--sm status-approved">Success</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@section scripts {
+    <script>
+
+        $(document).ready(function () {
+
+            $("body").addClass("user-dashboard");
+
+        });
+    </script>
+}
