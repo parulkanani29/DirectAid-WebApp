@@ -18,13 +18,11 @@
         <div class="col-md-12">
             <form asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    @*<label asp-for="WalletName" class="control-label"></label>*@
-                    <input asp-for="WalletName" class="form-control" placeholder="Choose Wallet"/>
+                <div class="form-group">                    
+                    <input asp-for="WalletName" class="form-control" placeholder="Enter Wallet name"/>
                     <span asp-validation-for="WalletName" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    @*<label asp-for="Password" class="control-label"></label>*@
+                <div class="form-group">                    
                     <input asp-for="Password" class="form-control" placeholder="Enter Your Password" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>

@@ -19,8 +19,8 @@ namespace AidWebApp.Models
         public string WalletAddress { get; set; }
 
         [Required]
-        [DisplayName("Average Income")]
-        public decimal AverageIncome { get; set; }
+        [DisplayName("Average Income")]        
+        public long AverageIncome { get; set; }
 
         [DisplayName("Applicant Name")]
         public string UserFullName { get; set; }
